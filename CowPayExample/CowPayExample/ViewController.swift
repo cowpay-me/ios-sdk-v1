@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     let billingData = ["customer_mobile":"01234567891",
                        "customer_email":"example@gmail.com",
                        "customer_merchant_profile_id":"15",
+                       "description":"sample description from ios",
                        "merchant_reference_id":String(UUID().uuidString.split(separator: "-").first!),
                        "amount":"1"]
     
