@@ -7,6 +7,7 @@
 
 import UIKit
 import CommonCrypto
+import WebKit
 
 class VisaViewController: UIViewController {
 
@@ -30,7 +31,7 @@ class VisaViewController: UIViewController {
     let viewLoading = UIView()
     let viewSucess = UIView()
     let viewError = UIView()
-    let webView = UIWebView()
+    let webView = WKWebView()
     
     var billingData = [String: String]()
     var dismissNav = false
@@ -204,7 +205,7 @@ class VisaViewController: UIViewController {
                                     
                                     HTTPCookieStorage.shared.cookieAcceptPolicy = .always
                                     
-                                    self.webView.loadRequest(request)
+                                    self.webView.load(request)
                                 }
                             } else {
                                 DispatchQueue.main.async {
@@ -531,39 +532,40 @@ extension VisaViewController: UITextFieldDelegate {
     }
 }
 
-extension VisaViewController: UIWebViewDelegate {
+extension VisaViewController: WKNavigationDelegate {
     
-    func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
-        if let query = request.url?.query {
-            let arr = query.components(separatedBy: "&")
-            if arr.count > 0 {
-                for item in arr {
-                    let arr2 = item.components(separatedBy: "=")
-                    if arr2[0].lowercased() == "payment_done" {
-                        for item2 in arr {
-                            let arr3 = item2.components(separatedBy: "=")
-                            if arr3[0].lowercased() == "payment_status" {
-                                if arr3[1].lowercased() == "paid" {
-                                    DispatchQueue.main.async {
-                                        self.viewSucess.isHidden = false
-                                        self.btnDismiss.isHidden = true
-                                        self.webView.isHidden = true
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                                            self.backHome()
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+                if let query = webView.url?.query {
+                    let arr = query.components(separatedBy: "&")
+                    if arr.count > 0 {
+                        for item in arr {
+                            let arr2 = item.components(separatedBy: "=")
+                            if arr2[0].lowercased() == "orderstatus" {
+                                for item2 in arr {
+                                    let arr3 = item2.components(separatedBy: "=")
+                                    if arr3[0].lowercased() == "orderstatus" {
+                                        if arr3[1].lowercased() == "paid" {
+                                            DispatchQueue.main.async {
+                                                self.viewSucess.isHidden = false
+                                                self.btnDismiss.isHidden = true
+                                                self.webView.isHidden = true
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                                    self.backHome()
+                                                }
+                                            }
+                                        } else {
+                                            DispatchQueue.main.async {
+                                                self.viewError.isHidden = false
+                                                self.webView.isHidden = true
+                                            }
                                         }
-                                    }
-                                } else {
-                                    DispatchQueue.main.async {
-                                        self.viewError.isHidden = false
-                                        self.webView.isHidden = true
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-        return true
     }
+    
+
 }

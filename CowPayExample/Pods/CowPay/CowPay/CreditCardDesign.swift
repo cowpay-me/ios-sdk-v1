@@ -465,7 +465,7 @@ extension VisaViewController {
     
     func initWebView() {
         view.addSubview(webView)
-        webView.delegate = self
+        webView.navigationDelegate = self
         webView.isHidden = true
         
         webView.translatesAutoresizingMaskIntoConstraints = false
