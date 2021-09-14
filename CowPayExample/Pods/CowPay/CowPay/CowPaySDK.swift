@@ -122,7 +122,9 @@ open class CowPaySDK {
             return nil
         }
         enhancedBillingData.updateValue("EGP", forKey: "currency_code")
-        enhancedBillingData.updateValue("item details", forKey: "description")
+        if let description = enhancedBillingData["description"]  {
+            enhancedBillingData.updateValue(description, forKey: "description")
+        }
         enhancedBillingData.updateValue("[{\"itemId\": \"1\", \"description\": \"description\",\"price\": \(String(format:"%.2f", Double(billingData["amount"]!) ?? 0.0)), \"quantity\": \"1\"}]", forKey: "charge_items")
         return enhancedBillingData
     }
